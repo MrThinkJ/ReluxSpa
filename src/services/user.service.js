@@ -93,7 +93,9 @@ class UserService {
   list = async (paging, cond) => {
     const condData = UserCondDTOSchema.parse(cond);
     const { limit, offset } = PagingDTOSchema.parse(paging);
-    return await models.User.findAll({ where: condData, limit, offset });
+    const result = await models.User.findAll({ where: condData, limit, offset });
+    const resultData = result.map((user) => user.get({ plain: true }));
+    return resultData;
   };
 
   getDetail = async (id) => {
@@ -101,7 +103,7 @@ class UserService {
     if (!user) {
       throw ErrDataNotFound;
     }
-    return user;
+    return user.get({ plain: true });
   };
 
   create = async (data) => {

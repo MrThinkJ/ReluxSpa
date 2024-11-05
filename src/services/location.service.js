@@ -9,11 +9,13 @@ const {
 class LocationService {
   list = async (paging, cond) => {
     const data = LocationCondDTOSchema.parse(cond);
-    return await models.Location.findAll({
+    const result = await models.Location.findAll({
       where: data,
       limit: paging.limit,
       offset: paging.offset,
     });
+    const resultData = result.map((location) => location.get({ plain: true }));
+    return resultData;
   };
 
   getDetail = async (id) => {
@@ -21,7 +23,7 @@ class LocationService {
     if (!location) {
       throw ErrDataNotFound;
     }
-    return location;
+    return location.get({ plain: true });
   };
 
   create = async (data) => {

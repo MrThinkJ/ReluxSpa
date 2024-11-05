@@ -16,9 +16,13 @@ app.use(cookieParser());
 const userRoutes = require("./routes/user.route");
 const locationRoutes = require("./routes/location.route");
 const promotionRoutes = require("./routes/promotion.route");
+const serviceCategoryRoutes = require("./routes/serviceCategory.route");
+const serviceRoutes = require("./routes/service.route");
 app.use("/v1", userRoutes);
 app.use("/v1/locations", locationRoutes);
 app.use("/v1/promotions", promotionRoutes);
+app.use("/v1/service-categories", serviceCategoryRoutes);
+app.use("/v1/services", serviceRoutes);
 app.use((req, res) => {
   res.status(404).json({ message: "Not Found" });
 });

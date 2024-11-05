@@ -7,37 +7,47 @@ const modelName = "Service";
 module.exports = (sequelize) => {
   Service.init(
     {
-      ServiceID: {
+      id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
+        field: "ServiceID",
       },
-      Name: {
+      name: {
         type: DataTypes.STRING(255),
+        field: "Name",
       },
-      Price: {
+      price: {
         type: DataTypes.DECIMAL,
+        field: "Price",
       },
-      DescriptionShort: {
+      descriptionShort: {
         type: DataTypes.TEXT,
+        field: "DescriptionShort",
       },
-      Description1: {
+      description1: {
         type: DataTypes.TEXT,
+        field: "Description1",
       },
-      ImageDescription: {
+      imageDescription: {
         type: DataTypes.STRING(255),
+        field: "ImageDescription",
       },
-      Description2: {
+      description2: {
         type: DataTypes.TEXT,
+        field: "Description2",
       },
-      ImageMain: {
+      imageMain: {
         type: DataTypes.STRING(255),
+        field: "ImageMain",
       },
-      Image_icon: {
+      imageIcon: {
         type: DataTypes.STRING(255),
+        field: "Image_icon",
       },
-      Duration: {
+      duration: {
         type: DataTypes.INTEGER,
+        field: "Duration",
       },
     },
     {

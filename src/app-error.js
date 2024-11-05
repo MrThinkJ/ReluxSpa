@@ -65,35 +65,42 @@ class AppError extends Error {
 // Util error function
 const responseErr = (err, res) => {
   const isProduction = process.env.NODE_ENV === "production";
-  !isProduction && console.error(err.stack);
+  !isProduction && console.log("Error:", err); // Debug log
 
   if (err instanceof AppError) {
     res.status(err.getStatusCode()).json(err.toJSON(isProduction));
     return;
   }
 
-  // Handle both ZodError instance and stringified ZodError
-  if (err instanceof ZodError || err.error) {
+  // Handle Zod validation errors
+  if (err instanceof ZodError) {
     const appErr = ErrInvalidRequest.wrap(err);
-    let zodErrors = [];
 
-    if (err instanceof ZodError) {
-      zodErrors = err.errors;
-    } else if (typeof err.error === "string") {
-      try {
-        zodErrors = JSON.parse(err.error);
-      } catch (e) {
-        zodErrors = [{ path: ["unknown"], message: err.error }];
-      }
-    }
-
-    zodErrors.forEach((error) => {
-      const path = Array.isArray(error.path) ? error.path.join(".") : error.path;
-      appErr.withDetail(path, error.message);
+    err.issues.forEach((issue) => {
+      appErr.withDetail(issue.path.join("."), issue.message);
     });
 
     res.status(appErr.getStatusCode()).json(appErr.toJSON(isProduction));
     return;
+  }
+
+  // Handle stringified Zod errors
+  if (err.error && typeof err.error === "string") {
+    try {
+      const parsedError = JSON.parse(err.error);
+      const appErr = ErrInvalidRequest.wrap(new Error("Validation failed"));
+
+      if (Array.isArray(parsedError)) {
+        parsedError.forEach((issue) => {
+          appErr.withDetail(issue.path.join("."), issue.message);
+        });
+      }
+
+      res.status(appErr.getStatusCode()).json(appErr.toJSON(isProduction));
+      return;
+    } catch (e) {
+      console.error("Error parsing validation error:", e);
+    }
   }
 
   const appErr = ErrInternalServer.wrap(err);

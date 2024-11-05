@@ -4,59 +4,39 @@ const { PagingDTOSchema } = require("../validation/paging.validation");
 
 class LocationController {
   list = async (req, res) => {
-    try {
-      const { success, data: paging, error } = PagingDTOSchema.safeParse(req.query);
-      if (!success) {
-        res.status(400).json({
-          message: "Invalid paging",
-          error: error.message,
-        });
-        return;
-      }
-      const result = await LocationService.list(paging, req.query);
-      res.status(200).json({ data: result, paging, filter: req.query });
-    } catch (error) {
-      res.status(error.status || 500).json({ error: error.message });
+    const { success, data, error } = PagingDTOSchema.safeParse(req.query);
+    if (!success) {
+      res.status(400).json({
+        message: "Invalid paging",
+        error: error.message,
+      });
+      return;
     }
+    const result = await LocationService.list(data, req.query);
+    res.status(200).json({ data: result, paging: data, filter: req.query });
   };
 
   getDetail = async (req, res) => {
-    try {
-      const { id } = req.params;
-      const result = await LocationService.getDetail(Number(id));
-      res.status(200).json({ data: result });
-    } catch (error) {
-      res.status(error.status || 500).json({ error: error.message });
-    }
+    const { id } = req.params;
+    const result = await LocationService.getDetail(Number(id));
+    res.status(200).json({ data: result });
   };
 
   create = async (req, res) => {
-    try {
-      const result = await LocationService.create(req.body);
-      res.status(201).json({ data: result });
-    } catch (error) {
-      res.status(error.status || 500).json({ error: error.message });
-    }
+    const result = await LocationService.create(req.body);
+    res.status(201).json({ data: result });
   };
 
   update = async (req, res) => {
-    try {
-      const { id } = req.params;
-      const result = await LocationService.update(Number(id), req.body);
-      res.status(200).json({ data: result });
-    } catch (error) {
-      res.status(error.status || 500).json({ error: error.message });
-    }
+    const { id } = req.params;
+    const result = await LocationService.update(Number(id), req.body);
+    res.status(200).json({ data: result });
   };
 
   delete = async (req, res) => {
-    try {
-      const { id } = req.params;
-      const result = await LocationService.delete(Number(id));
-      res.status(200).json({ data: result });
-    } catch (error) {
-      res.status(error.status || 500).json({ error: error.message });
-    }
+    const { id } = req.params;
+    const result = await LocationService.delete(Number(id));
+    res.status(200).json({ data: result });
   };
 }
 

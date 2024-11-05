@@ -8,12 +8,14 @@ const {
 
 class PromotionService {
   list = async (paging, cond) => {
-    const data = PromotionCondDTOSchema.parse(cond);
-    return await models.Promotion.findAll({
-      where: data,
+    const condValue = PromotionCondDTOSchema.parse(cond);
+    const result = await models.Promotion.findAll({
+      where: condValue,
       limit: paging.limit,
       offset: paging.offset,
     });
+    const resultData = result.map((promotion) => promotion.get({ plain: true }));
+    return resultData;
   };
 
   getDetail = async (id) => {
@@ -21,21 +23,22 @@ class PromotionService {
     if (!promotion) {
       throw ErrDataNotFound;
     }
-    return promotion;
+    return promotion.get({ plain: true });
   };
 
   create = async (data) => {
-    const promotion = PromotionCreateDTOSchema.parse(data);
-    return await models.Promotion.create(promotion);
+    const value = PromotionCreateDTOSchema.parse(data);
+    const promotion = await models.Promotion.create(value);
+    return promotion.get({ plain: true }).id;
   };
 
   update = async (id, data) => {
-    const promotionData = PromotionUpdateDTOSchema.parse(data);
+    const value = PromotionUpdateDTOSchema.parse(data);
     const promotion = await models.Promotion.findByPk(id);
     if (!promotion) {
       throw ErrDataNotFound;
     }
-    await models.Promotion.update(promotionData, { where: { id } });
+    await models.Promotion.update(value, { where: { id } });
     return true;
   };
 
