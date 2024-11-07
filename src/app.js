@@ -22,6 +22,7 @@ const workScheduleRoutes = require("./routes/workSchedule.route");
 const paymentMethodRoutes = require("./routes/paymentMethod.route");
 const employeeRoutes = require("./routes/employee.route");
 const resetPasswordRoutes = require("./routes/resetPassword.route");
+const contactRoutes = require("./routes/contact.route");
 app.use("/v1", userRoutes);
 app.use("/v1/locations", locationRoutes);
 app.use("/v1/promotions", promotionRoutes);
@@ -31,6 +32,7 @@ app.use("/v1/work-schedules", workScheduleRoutes);
 app.use("/v1/payment-methods", paymentMethodRoutes);
 app.use("/v1/employees", employeeRoutes);
 app.use("/v1/password", resetPasswordRoutes);
+app.use("/v1/contacts", contactRoutes);
 app.use((req, res) => {
   res.status(404).json({ message: "Not Found" });
 });

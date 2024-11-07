@@ -24,7 +24,7 @@ module.exports = (sequelize) =>
     },
     {
       sequelize,
-      tableName: "password_reset_token",
+      tableName: "PasswordResetTokens",
       modelName,
       timestamps: false,
     }
