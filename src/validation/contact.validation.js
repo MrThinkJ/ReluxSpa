@@ -23,7 +23,5 @@ const ContactCondDTOSchema = z.object({
 
 module.exports = {
   ContactSchema,
-  ContactCreateDTOSchema,
-  ContactUpdateDTOSchema,
   ContactCondDTOSchema,
 };
