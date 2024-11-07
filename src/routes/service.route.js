@@ -8,5 +8,5 @@ router.get("/:id", ServiceController.getDetail);
 router.post("/", authMiddleware, allowRoles(["ADMIN"]), ServiceController.create);
 router.patch("/:id", authMiddleware, allowRoles(["ADMIN"]), ServiceController.update);
 router.delete("/:id", authMiddleware, allowRoles(["ADMIN"]), ServiceController.delete);
-
+router.get("/category/:categoryId", ServiceController.getByCategoryId);
 module.exports = router;

@@ -113,6 +113,11 @@ const ErrUnauthorized = AppError.from(new Error("Unauthorized"), 401);
 const ErrForbidden = AppError.from(new Error("Forbidden"), 403);
 const ErrNotFound = AppError.from(new Error("Not found"), 404);
 const ErrMethodNotAllowed = AppError.from(new Error("Method not allowed"), 405);
+const ErrUserNotFound = AppError.from(new Error("User not found"), 404);
+const ErrOTPNotFound = AppError.from(new Error("OTP not found"), 404);
+const ErrInvalidOTP = AppError.from(new Error("Invalid OTP"), 400);
+const ErrOTPUsed = AppError.from(new Error("OTP used"), 400);
+const ErrPasswordResetNotFound = AppError.from(new Error("Password reset not found"), 404);
 
 module.exports = {
   AppError,
@@ -123,4 +128,8 @@ module.exports = {
   ErrForbidden,
   ErrNotFound,
   ErrMethodNotAllowed,
+  ErrUserNotFound,
+  ErrInvalidOTP,
+  ErrOTPUsed,
+  ErrPasswordResetNotFound,
 };

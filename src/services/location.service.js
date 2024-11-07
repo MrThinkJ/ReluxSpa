@@ -12,10 +12,9 @@ class LocationService {
     const result = await models.Location.findAll({
       where: data,
       limit: paging.limit,
-      offset: paging.offset,
+      offset: (paging.page - 1) * paging.limit,
     });
-    const resultData = result.map((location) => location.get({ plain: true }));
-    return resultData;
+    return result.map((location) => location.get({ plain: true }));
   };
 
   getDetail = async (id) => {
@@ -28,8 +27,8 @@ class LocationService {
 
   create = async (data) => {
     const location = LocationCreateDTOSchema.parse(data);
-
-    return await models.Location.create(location);
+    const newLocation = await models.Location.create(location);
+    return newLocation.get({ plain: true }).id;
   };
 
   update = async (id, data) => {

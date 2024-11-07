@@ -1,48 +1,41 @@
-const ServiceModuleService = require("../services/serviceModule.service");
+const PaymentMethodService = require("../services/paymentMethod.service");
 const { PagingDTOSchema } = require("../validation/paging.validation");
 
-class ServiceController {
-  list = async (req, res) => {
+class PaymentMethodController {
+  list = async (req, res, next) => {
     const { success, data, error } = PagingDTOSchema.safeParse(req.query);
     if (!success) {
       res.status(400).json({
         message: "Invalid paging",
         error: error.message,
       });
-      return;
     }
-    const result = await ServiceModuleService.list(data, req.query);
+    const result = await PaymentMethodService.list(data, req.query);
     res.status(200).json({ data: result, paging: data, filter: req.query });
   };
 
   getDetail = async (req, res) => {
     const { id } = req.params;
-    const result = await ServiceModuleService.getDetail(Number(id));
+    const result = await PaymentMethodService.getDetail(Number(id));
     res.status(200).json({ data: result });
   };
 
   create = async (req, res) => {
-    const result = await ServiceModuleService.create(req.body);
+    const result = await PaymentMethodService.create(req.body);
     res.status(201).json({ data: result });
   };
 
   update = async (req, res) => {
     const { id } = req.params;
-    const result = await ServiceModuleService.update(Number(id), req.body);
+    const result = await PaymentMethodService.update(Number(id), req.body);
     res.status(200).json({ data: result });
   };
 
   delete = async (req, res) => {
     const { id } = req.params;
-    const result = await ServiceModuleService.delete(Number(id));
-    res.status(200).json({ data: result });
-  };
-
-  getByCategoryId = async (req, res) => {
-    const { categoryId } = req.params;
-    const result = await ServiceModuleService.getByCategoryId(Number(categoryId));
+    const result = await PaymentMethodService.delete(Number(id));
     res.status(200).json({ data: result });
   };
 }
 
-module.exports = new ServiceController();
+module.exports = new PaymentMethodController();

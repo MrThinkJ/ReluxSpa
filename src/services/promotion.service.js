@@ -12,10 +12,9 @@ class PromotionService {
     const result = await models.Promotion.findAll({
       where: condValue,
       limit: paging.limit,
-      offset: paging.offset,
+      offset: (paging.page - 1) * paging.limit,
     });
-    const resultData = result.map((promotion) => promotion.get({ plain: true }));
-    return resultData;
+    return result.map((promotion) => promotion.get({ plain: true }));
   };
 
   getDetail = async (id) => {

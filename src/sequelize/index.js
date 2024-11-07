@@ -25,6 +25,12 @@ const modelDefiners = [
   require("./models/serviceCategory.model"),
   require("./models/workSchedule.model"),
   require("./models/promotion.model"),
+  require("./models/employee.model"),
+  require("./models/otp.model"),
+  require("./models/booking.model"),
+  require("./models/employeeWorkSchedule.model"),
+  require("./models/paymentMethod.model"),
+  require("./models/passwordResetToken.model"),
 ];
 
 for (const modelDefiner of modelDefiners) {

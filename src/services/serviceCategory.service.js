@@ -12,7 +12,7 @@ class ServiceCategoryService {
     const result = await models.ServiceCategory.findAll({
       where: condValue,
       limit: paging.limit,
-      offset: paging.offset,
+      offset: (paging.page - 1) * paging.limit,
     });
     const resultData = result.map((serviceCategory) => serviceCategory.get({ plain: true }));
     return resultData;

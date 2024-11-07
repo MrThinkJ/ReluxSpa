@@ -16,7 +16,6 @@ A robust TypeScript-based backend service built with Express.js and MySQL, featu
 
 - Node.js (v14 or higher)
 - MySQL Server
-- TypeScript knowledge
 - npm or yarn
 
 ## Installation
@@ -59,7 +58,6 @@ The server will be running at http://localhost:3000
 ## Technologies
 
 - Express.js
-- TypeScript
 - Sequelize ORM
 - MySQL
 - JSON Web Tokens (JWT)
