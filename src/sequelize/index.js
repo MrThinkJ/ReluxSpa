@@ -31,6 +31,7 @@ const modelDefiners = [
   require("./models/bookingService.model"),
   require("./models/employeeWorkSchedule.model"),
   require("./models/passwordResetToken.model"),
+  require("./models/contact.model"),
 ];
 
 for (const modelDefiner of modelDefiners) {

@@ -28,7 +28,7 @@ module.exports = (sequelize) =>
     },
     {
       sequelize,
-      tableName: "Contacts",
+      tableName: "Contact",
       modelName,
       timestamps: false,
     }
