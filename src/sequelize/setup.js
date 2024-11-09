@@ -7,12 +7,12 @@ function applySetup(sequelize) {
     Role,
     Location,
     Employee,
-    PaymentMethod,
     Booking,
     EmployeeWorkSchedule,
     Otp,
     PasswordResetToken,
     User,
+    BookingService,
   } = sequelize.models;
 
   // Service & ServiceCategory relationship
@@ -51,18 +51,6 @@ function applySetup(sequelize) {
     otherKey: "employeeId",
   });
 
-  // Booking & PaymentMethod relationship
-  Booking.belongsTo(PaymentMethod, {
-    foreignKey: "paymentMethodId",
-    targetKey: "id",
-    field: "PaymentMethodID",
-  });
-  PaymentMethod.hasMany(Booking, {
-    foreignKey: "paymentMethodId",
-    sourceKey: "id",
-    field: "PaymentMethodID",
-  });
-
   // Booking & Location relationship
   Booking.belongsTo(Location, {
     foreignKey: "locationId",
@@ -87,18 +75,6 @@ function applySetup(sequelize) {
     field: "EmployeeID",
   });
 
-  // Booking & Service relationship
-  Booking.belongsTo(Service, {
-    foreignKey: "serviceId",
-    targetKey: "id",
-    field: "ServiceID",
-  });
-  Service.hasMany(Booking, {
-    foreignKey: "serviceId",
-    sourceKey: "id",
-    field: "ServiceID",
-  });
-
   // Booking & Customer relationship
   Booking.belongsTo(User, {
     foreignKey: "customerId",
@@ -109,6 +85,18 @@ function applySetup(sequelize) {
     foreignKey: "customerId",
     sourceKey: "id",
     field: "CustomerID",
+  });
+
+  // Booking & Service relationship
+  Booking.belongsToMany(Service, {
+    through: BookingService,
+    foreignKey: "bookingId",
+    otherKey: "serviceId",
+  });
+  Service.belongsToMany(Booking, {
+    through: BookingService,
+    foreignKey: "serviceId",
+    otherKey: "bookingId",
   });
 
   // User & PasswordResetToken relationship

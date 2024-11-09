@@ -13,18 +13,6 @@ module.exports = (sequelize) =>
         autoIncrement: true,
         field: "BookingID",
       },
-      name: {
-        type: DataTypes.STRING,
-        field: "Name",
-      },
-      email: {
-        type: DataTypes.STRING,
-        field: "Email",
-      },
-      phone: {
-        type: DataTypes.STRING,
-        field: "Phone",
-      },
       bookingTime: {
         type: DataTypes.DATE,
         field: "BookingTime",

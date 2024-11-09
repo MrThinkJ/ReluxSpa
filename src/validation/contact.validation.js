@@ -21,7 +21,10 @@ const ContactCondDTOSchema = z.object({
   email: z.string().email().optional(),
 });
 
+const ContactCreateDTOSchema = ContactSchema.omit({ id: true });
+
 module.exports = {
   ContactSchema,
   ContactCondDTOSchema,
+  ContactCreateDTOSchema,
 };

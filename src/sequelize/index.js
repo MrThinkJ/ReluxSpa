@@ -28,8 +28,8 @@ const modelDefiners = [
   require("./models/employee.model"),
   require("./models/otp.model"),
   require("./models/booking.model"),
+  require("./models/bookingService.model"),
   require("./models/employeeWorkSchedule.model"),
-  require("./models/paymentMethod.model"),
   require("./models/passwordResetToken.model"),
 ];
 

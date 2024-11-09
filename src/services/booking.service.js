@@ -20,20 +20,24 @@ class BookingService {
     return booking.get({ plain: true });
   };
 
-  create = async (data) => {
+  makeBooking = async (data) => {
     const bookingData = BookingCreateDTOSchema.parse(data);
+    const location = await models.Location.findByPk(bookingData.locationId);
+    if (!location) {
+      throw ErrLocationNotFound;
+    }
+    const customer = await models.Customer.findByPk(bookingData.customerId);
+    if (!customer) {
+      throw ErrCustomerNotFound;
+    }
+    const services = await models.Service.findAll({
+      where: { id: { [Op.in]: bookingData.serviceIds } },
+    });
+    if (services.length !== bookingData.serviceIds.length) {
+      throw ErrServiceNotFound;
+    }
     const booking = await models.Booking.create(bookingData);
     return booking.get({ plain: true }).id;
-  };
-
-  update = async (id, data) => {
-    const bookingData = BookingUpdateDTOSchema.parse(data);
-    const booking = await models.Booking.findByPk(id);
-    if (!booking) {
-      throw ErrDataNotFound;
-    }
-    await models.Booking.update(bookingData, { where: { id } });
-    return true;
   };
 
   delete = async (id) => {
@@ -46,4 +50,4 @@ class BookingService {
   };
 }
 
-module.exports = BookingService;
+module.exports = new BookingService();

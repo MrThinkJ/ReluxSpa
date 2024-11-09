@@ -1,10 +1,6 @@
 const { models } = require("../sequelize");
 const { ErrDataNotFound } = require("../errors/base.error");
-const {
-  ContactCondDTOSchema,
-  ContactCreateDTOSchema,
-  ContactUpdateDTOSchema,
-} = require("../validation/contact.validation");
+const { ContactCondDTOSchema, ContactCreateDTOSchema } = require("../validation/contact.validation");
 
 class ContactService {
   list = async (paging, cond) => {

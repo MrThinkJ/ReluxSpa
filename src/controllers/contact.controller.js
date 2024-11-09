@@ -22,7 +22,7 @@ class ContactController {
   };
 
   getByEmail = async (req, res) => {
-    const { email } = req.params;
+    const { email } = req.body;
     const result = await ContactService.getByEmail(email);
     res.status(200).json({ data: result });
   };
