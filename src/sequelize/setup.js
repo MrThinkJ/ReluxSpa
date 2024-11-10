@@ -20,11 +20,13 @@ function applySetup(sequelize) {
     foreignKey: "categoryId",
     targetKey: "id",
     field: "CategoryID",
+    as: "category",
   });
   ServiceCategory.hasMany(Service, {
     foreignKey: "categoryId",
     sourceKey: "id",
     field: "CategoryID",
+    as: "services",
   });
 
   // Service & Promotion relationship
@@ -32,11 +34,13 @@ function applySetup(sequelize) {
     foreignKey: "promotionId",
     targetKey: "id",
     field: "PromotionID",
+    as: "promotion",
   });
   Promotion.hasMany(Service, {
     foreignKey: "promotionId",
     sourceKey: "id",
     field: "PromotionID",
+    as: "services",
   });
 
   // Employee & WorkSchedule relationship
@@ -56,6 +60,7 @@ function applySetup(sequelize) {
     foreignKey: "locationId",
     targetKey: "id",
     field: "LocationID",
+    as: "location",
   });
   Location.hasMany(Booking, {
     foreignKey: "locationId",
@@ -68,11 +73,13 @@ function applySetup(sequelize) {
     foreignKey: "employeeId",
     targetKey: "id",
     field: "EmployeeID",
+    as: "employee",
   });
   Employee.hasMany(Booking, {
     foreignKey: "employeeId",
     sourceKey: "id",
     field: "EmployeeID",
+    as: "bookings",
   });
 
   // Booking & Customer relationship
@@ -80,11 +87,13 @@ function applySetup(sequelize) {
     foreignKey: "customerId",
     targetKey: "id",
     field: "CustomerID",
+    as: "customer",
   });
   User.hasMany(Booking, {
     foreignKey: "customerId",
     sourceKey: "id",
     field: "CustomerID",
+    as: "bookings",
   });
 
   // Booking & Service relationship

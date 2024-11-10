@@ -11,8 +11,8 @@ class ServiceCategoryController {
       });
       return;
     }
-    const result = await ServiceCategoryService.list(data, req.query);
-    res.status(200).json({ data: result, paging: data, filter: req.query });
+    const result = await ServiceCategoryService.list(data, req.body);
+    res.status(200).json({ data: result, paging: data, filter: req.body });
   };
 
   getDetail = async (req, res) => {

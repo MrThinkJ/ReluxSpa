@@ -11,6 +11,7 @@ const { ErrPromotionNotFound } = require("../errors/promotion.error");
 class ServiceModuleService {
   list = async (paging, cond) => {
     const condValue = ServiceCondDTOSchema.parse(cond);
+    console.log(condValue);
     const result = await models.Service.findAll({
       where: condValue,
       limit: paging.limit,
