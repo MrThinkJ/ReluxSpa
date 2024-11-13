@@ -115,6 +115,20 @@ class ServiceModuleService {
     const services = await models.Service.findAll({ where: { categoryId } });
     return services.map((service) => service.get({ plain: true }));
   };
+
+  getServiceHasPromotion = async () => {
+    const services = await models.Service.findAll({
+      where: { promotionId: { [Op.ne]: null } },
+      include: [
+        {
+          model: models.Promotion,
+          as: "promotion",
+          attributes: ["id", "description", "startDate", "endDate", "discountPercentage"],
+        },
+      ],
+    });
+    return services.map((service) => service.get({ plain: true }));
+  };
 }
 
 module.exports = new ServiceModuleService();

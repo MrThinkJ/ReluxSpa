@@ -43,6 +43,11 @@ class ServiceController {
     const result = await ServiceModuleService.getByCategoryId(Number(categoryId));
     res.status(200).json({ data: result });
   };
+
+  getServiceHasPromotion = async (req, res) => {
+    const result = await ServiceModuleService.getServiceHasPromotion();
+    res.status(200).json({ data: result });
+  };
 }
 
 module.exports = new ServiceController();

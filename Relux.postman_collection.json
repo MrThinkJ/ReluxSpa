@@ -877,6 +877,15 @@
             "url": "{{host}}/v1/services/1"
           },
           "response": []
+        },
+        {
+          "name": "Get Service Has Promotion",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{host}}/v1/services/promotion"
+          },
+          "response": []
         }
       ]
     },
