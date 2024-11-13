@@ -26,4 +26,7 @@ router.delete(
 
 router.get("/:id/bookings", authMiddleware, EmployeeController.getBookings);
 
+router.get("/:id/is-available", authMiddleware, EmployeeController.getEmployeeIsAvailable);
+router.get("/:id/free-time", authMiddleware, EmployeeController.getEmployeeFreeTime);
+
 module.exports = router;

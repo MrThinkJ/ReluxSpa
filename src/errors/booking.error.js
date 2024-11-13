@@ -17,6 +17,10 @@ const ErrLocationIdRequired = new Error("Location ID is required");
 const ErrEmployeeIdRequired = new Error("Employee ID is required");
 const ErrPaymentMethodIdRequired = new Error("Payment method ID is required");
 const ErrCustomerIdRequired = new Error("Customer ID is required");
+const ErrEmployeeNotFound = new Error("Employee not found");
+const ErrLocationNotFound = new Error("Location not found");
+const ErrCustomerNotFound = new Error("Customer not found");
+const ErrServiceNotFound = new Error("Service not found");
 
 module.exports = {
   ErrNameRequired,
@@ -34,4 +38,8 @@ module.exports = {
   ErrEmployeeIdRequired,
   ErrPaymentMethodIdRequired,
   ErrCustomerIdRequired,
+  ErrEmployeeNotFound,
+  ErrLocationNotFound,
+  ErrCustomerNotFound,
+  ErrServiceNotFound,
 };

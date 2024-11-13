@@ -38,9 +38,20 @@ const EmployeeCondDTOSchema = z.object({
   locationId: z.number().optional(),
 });
 
+const EmployeeBookingCondDTOSchema = z.object({
+  bookingTime: z.string().datetime(),
+  duration: z.number().optional(),
+});
+
+const EmployeeFreeTimeCondDTOSchema = z.object({
+  date: z.string().datetime(),
+});
+
 module.exports = {
   EmployeeSchema,
   EmployeeCreateDTOSchema,
   EmployeeUpdateDTOSchema,
   EmployeeCondDTOSchema,
+  EmployeeBookingCondDTOSchema,
+  EmployeeFreeTimeCondDTOSchema,
 };

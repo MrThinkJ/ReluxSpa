@@ -30,6 +30,12 @@ class BookingController {
     const result = await BookingService.makeBooking(req.body);
     res.status(200).json({ data: result });
   };
+
+  getByUserId = async (req, res) => {
+    const { id } = req.params;
+    const result = await BookingService.getByUserId(Number(id));
+    res.status(200).json({ data: result });
+  };
 }
 
 module.exports = new BookingController();

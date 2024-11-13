@@ -21,6 +21,10 @@ module.exports = (sequelize) =>
         type: DataTypes.TEXT,
         field: "BookingNotes",
       },
+      endTime: {
+        type: DataTypes.DATE,
+        field: "EndTime",
+      },
     },
     {
       sequelize,

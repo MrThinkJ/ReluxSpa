@@ -48,11 +48,13 @@ function applySetup(sequelize) {
     through: EmployeeWorkSchedule,
     foreignKey: "employeeId",
     otherKey: "workScheduleId",
+    as: "workSchedules",
   });
   WorkSchedule.belongsToMany(Employee, {
     through: EmployeeWorkSchedule,
     foreignKey: "workScheduleId",
     otherKey: "employeeId",
+    as: "employees",
   });
 
   // Booking & Location relationship
@@ -66,6 +68,7 @@ function applySetup(sequelize) {
     foreignKey: "locationId",
     sourceKey: "id",
     field: "LocationID",
+    as: "bookings",
   });
 
   // Booking & Employee relationship
@@ -101,11 +104,13 @@ function applySetup(sequelize) {
     through: BookingService,
     foreignKey: "bookingId",
     otherKey: "serviceId",
+    as: "services",
   });
   Service.belongsToMany(Booking, {
     through: BookingService,
     foreignKey: "serviceId",
     otherKey: "bookingId",
+    as: "bookings",
   });
 
   // User & PasswordResetToken relationship
@@ -113,11 +118,27 @@ function applySetup(sequelize) {
     foreignKey: "userId",
     targetKey: "id",
     field: "UserID",
+    as: "passwordResetTokens",
   });
   PasswordResetToken.belongsTo(User, {
     foreignKey: "userId",
     targetKey: "id",
     field: "UserID",
+    as: "user",
+  });
+
+  // Employee & Location relationship
+  Employee.belongsTo(Location, {
+    foreignKey: "locationId",
+    targetKey: "id",
+    field: "LocationID",
+    as: "location",
+  });
+  Location.hasMany(Employee, {
+    foreignKey: "locationId",
+    sourceKey: "id",
+    field: "LocationID",
+    as: "employees",
   });
 }
 

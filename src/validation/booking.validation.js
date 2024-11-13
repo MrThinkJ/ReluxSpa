@@ -19,7 +19,6 @@ const BookingSchema = z.object({
 
 const BookingCreateDTOSchema = BookingSchema.omit({
   id: true,
-  employeeId: true,
 });
 
 const BookingUpdateDTOSchema = BookingCreateDTOSchema.omit({

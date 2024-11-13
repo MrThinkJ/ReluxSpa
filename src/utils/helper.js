@@ -6,4 +6,6 @@ function getIdParam(req) {
   throw new TypeError(`Invalid ':id' param: "${id}"`);
 }
 
-module.exports = { getIdParam };
+const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+module.exports = { getIdParam, weekday };

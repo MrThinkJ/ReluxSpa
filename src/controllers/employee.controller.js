@@ -61,6 +61,17 @@ class EmployeeController {
     const result = await EmployeeService.getBookings(Number(id));
     res.status(200).json({ data: result });
   };
+
+  getEmployeeIsAvailable = async (req, res) => {
+    const result = await EmployeeService.getEmployeeIsAvailable(req.body);
+    res.status(200).json({ data: result });
+  };
+
+  getEmployeeFreeTime = async (req, res) => {
+    const { id } = req.params;
+    const result = await EmployeeService.getEmployeeFreeTime(Number(id), req.body);
+    res.status(200).json({ data: result });
+  };
 }
 
 module.exports = new EmployeeController();
