@@ -1,9 +1,12 @@
 const router = require("express").Router();
 const BookingController = require("../controllers/booking.controller");
 
-router.get("/", BookingController.list);
-router.get("/:id", BookingController.getDetail);
-router.delete("/:id", BookingController.delete);
-router.post("/", BookingController.makeBooking);
-router.get("/user/:id", BookingController.getByUserId);
+const { authMiddleware } = require("../middlewares/auth");
+const { allowRoles } = require("../middlewares/check-role");
+
+router.get("/", authMiddleware, BookingController.list);
+router.get("/:id", authMiddleware, BookingController.getDetail);
+router.delete("/:id", authMiddleware, BookingController.delete);
+router.post("/", authMiddleware, BookingController.makeBooking);
+router.get("/user/:id", authMiddleware, BookingController.getByUserId);
 module.exports = router;

@@ -11,8 +11,8 @@ class ServiceController {
       });
       return;
     }
-    const result = await ServiceModuleService.list(data, req.body);
-    res.status(200).json({ data: result, paging: data, filter: req.body });
+    const result = await ServiceModuleService.list(data, req.query);
+    res.status(200).json({ data: result, paging: data, filter: req.query });
   };
 
   getDetail = async (req, res) => {

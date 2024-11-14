@@ -4,23 +4,23 @@ const { allowRoles } = require("../middlewares/check-role");
 
 const router = require("express").Router();
 
-router.get("/", authMiddleware, EmployeeController.list);
-router.get("/:id", authMiddleware, EmployeeController.getDetail);
-router.post("/", authMiddleware, allowRoles(["ADMIN"]), EmployeeController.create);
-router.patch("/:id", authMiddleware, allowRoles(["ADMIN"]), EmployeeController.update);
-router.delete("/:id", authMiddleware, allowRoles(["ADMIN"]), EmployeeController.delete);
+router.get("/", EmployeeController.list);
+router.get("/:id", EmployeeController.getDetail);
+router.post("/", authMiddleware, allowRoles(["ADMIN", "MANAGER"]), EmployeeController.create);
+router.patch("/:id", authMiddleware, allowRoles(["ADMIN", "MANAGER"]), EmployeeController.update);
+router.delete("/:id", authMiddleware, allowRoles(["ADMIN", "MANAGER"]), EmployeeController.delete);
 
 router.get("/:id/work-schedules", authMiddleware, EmployeeController.getWorkSchedules);
 router.post(
   "/:id/work-schedules/:scheduleId",
   authMiddleware,
-  allowRoles(["ADMIN"]),
+  allowRoles(["ADMIN", "MANAGER"]),
   EmployeeController.addWorkSchedule
 );
 router.delete(
   "/:id/work-schedules/:scheduleId",
   authMiddleware,
-  allowRoles(["ADMIN"]),
+  allowRoles(["ADMIN", "MANAGER"]),
   EmployeeController.removeWorkSchedule
 );
 

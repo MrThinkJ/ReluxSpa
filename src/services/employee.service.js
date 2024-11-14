@@ -6,6 +6,7 @@ const {
   EmployeeCreateDTOSchema,
   EmployeeUpdateDTOSchema,
   EmployeeBookingCondDTOSchema,
+  EmployeeFreeTimeCondDTOSchema,
 } = require("../validation/employee.validation");
 const { Op } = require("sequelize");
 

@@ -12,8 +12,8 @@ class LocationController {
       });
       return;
     }
-    const result = await LocationService.list(data, req.body);
-    res.status(200).json({ data: result, paging: data, filter: req.body });
+    const result = await LocationService.list(data, req.query);
+    res.status(200).json({ data: result, paging: data, filter: req.query });
   };
 
   getDetail = async (req, res) => {

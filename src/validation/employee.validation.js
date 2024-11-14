@@ -35,7 +35,7 @@ const EmployeeCondDTOSchema = z.object({
   phone: z.string().optional(),
   specialtyType: z.string().optional(),
   status: z.string().optional(),
-  locationId: z.number().optional(),
+  locationId: z.string().optional(),
 });
 
 const EmployeeBookingCondDTOSchema = z.object({

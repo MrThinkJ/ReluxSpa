@@ -6,8 +6,8 @@ const router = require("express").Router();
 
 router.get("/", PromotionController.list);
 router.get("/:id", PromotionController.getDetail);
-router.post("/", authMiddleware, allowRoles(["ADMIN"]), PromotionController.create);
-router.patch("/:id", authMiddleware, allowRoles(["ADMIN"]), PromotionController.update);
-router.delete("/:id", authMiddleware, allowRoles(["ADMIN"]), PromotionController.delete);
+router.post("/", authMiddleware, allowRoles(["ADMIN", "MANAGER"]), PromotionController.create);
+router.patch("/:id", authMiddleware, allowRoles(["ADMIN", "MANAGER"]), PromotionController.update);
+router.delete("/:id", authMiddleware, allowRoles(["ADMIN", "MANAGER"]), PromotionController.delete);
 
 module.exports = router;
