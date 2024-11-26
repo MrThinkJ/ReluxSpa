@@ -1,4 +1,5 @@
 const { models } = require("../sequelize");
+const { AppError } = require("../app-error");
 const { ErrDataNotFound } = require("../errors/base.error");
 const {
   ServiceCondDTOSchema,
@@ -48,7 +49,7 @@ class ServiceModuleService {
       ],
     });
     if (!service) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     return service.get({ plain: true });
   };
@@ -58,13 +59,13 @@ class ServiceModuleService {
     if (value.categoryId) {
       const category = await models.ServiceCategory.findByPk(value.categoryId);
       if (!category) {
-        throw ErrCategoryNotFound;
+        throw AppError.from(ErrCategoryNotFound, 404);
       }
     }
     if (value.promotionId) {
       const promotion = await models.Promotion.findByPk(value.promotionId);
       if (!promotion) {
-        throw ErrPromotionNotFound;
+        throw AppError.from(ErrPromotionNotFound, 404);
       }
     }
     const result = await models.Service.create(value);
@@ -75,18 +76,18 @@ class ServiceModuleService {
     const value = ServiceUpdateDTOSchema.parse(data);
     const service = await models.Service.findByPk(id);
     if (!service) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     if (value.categoryId) {
       const category = await models.ServiceCategory.findByPk(value.categoryId);
       if (!category) {
-        throw ErrCategoryNotFound;
+        throw AppError.from(ErrCategoryNotFound, 404);
       }
     }
     if (value.promotionId) {
       const promotion = await models.Promotion.findByPk(value.promotionId);
       if (!promotion) {
-        throw ErrPromotionNotFound;
+        throw AppError.from(ErrPromotionNotFound, 404);
       }
     }
     await models.Service.update(value, {
@@ -98,7 +99,7 @@ class ServiceModuleService {
   delete = async (id) => {
     const service = await models.Service.findByPk(id);
     if (!service) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     await models.Service.destroy({
       where: { id },
@@ -109,7 +110,7 @@ class ServiceModuleService {
   getByCategoryId = async (categoryId) => {
     const category = await models.ServiceCategory.findByPk(categoryId);
     if (!category) {
-      throw ErrCategoryNotFound;
+      throw AppError.from(ErrCategoryNotFound, 404);
     }
     const services = await models.Service.findAll({ where: { categoryId } });
     return services.map((service) => service.get({ plain: true }));

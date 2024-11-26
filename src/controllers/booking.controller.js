@@ -27,7 +27,11 @@ class BookingController {
   };
 
   makeBooking = async (req, res) => {
-    const result = await BookingService.makeBooking(req.body);
+    const bookingData = {
+      ...req.body,
+      customerUsername: res.locals.requester.username,
+    };
+    const result = await BookingService.makeBooking(bookingData);
     res.status(200).json({ data: result });
   };
 

@@ -14,11 +14,13 @@ const BookingSchema = z.object({
   serviceIds: z.array(z.number()).optional(),
   locationId: z.number(ErrLocationIdRequired),
   employeeId: z.number(ErrEmployeeIdRequired),
-  customerId: z.number(ErrCustomerIdRequired),
+  customerId: z.number().optional(),
 });
 
 const BookingCreateDTOSchema = BookingSchema.omit({
   id: true,
+}).extend({
+  customerUsername: z.string(),
 });
 
 const BookingUpdateDTOSchema = BookingCreateDTOSchema.omit({

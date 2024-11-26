@@ -1,4 +1,5 @@
 const { models } = require("../sequelize");
+const { AppError } = require("../app-error");
 const { ErrDataNotFound } = require("../errors/base.error");
 const {
   WorkScheduleCondDTOSchema,
@@ -21,7 +22,7 @@ class WorkScheduleService {
   getDetail = async (id) => {
     const schedule = await models.WorkSchedule.findByPk(id);
     if (!schedule) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     return schedule.get({ plain: true });
   };
@@ -36,7 +37,7 @@ class WorkScheduleService {
       const endDate = new Date(1970, 0, 1, parseInt(endHours), parseInt(endMinutes));
 
       if (endDate <= startDate) {
-        throw ErrEndTimeBeforeStartTime;
+        throw AppError.from(ErrEndTimeBeforeStartTime, 400);
       }
       value.startTime = `${value.startTime}:00`;
       value.endTime = `${value.endTime}:00`;
@@ -50,7 +51,7 @@ class WorkScheduleService {
     const value = WorkScheduleUpdateDTOSchema.parse(data);
     const schedule = await models.WorkSchedule.findByPk(id);
     if (!schedule) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     await models.WorkSchedule.update(value, { where: { id } });
     return true;
@@ -59,7 +60,7 @@ class WorkScheduleService {
   delete = async (id) => {
     const schedule = await models.WorkSchedule.findByPk(id);
     if (!schedule) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     await models.WorkSchedule.destroy({ where: { id } });
     return true;

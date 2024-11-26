@@ -1,4 +1,5 @@
 const { models } = require("../sequelize");
+const { AppError } = require("../app-error");
 const { ErrDataNotFound } = require("../errors/base.error");
 const {
   LocationCondDTOSchema,
@@ -20,7 +21,7 @@ class LocationService {
   getDetail = async (id) => {
     const location = await models.Location.findByPk(id);
     if (!location) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     return location.get({ plain: true });
   };
@@ -35,7 +36,7 @@ class LocationService {
     const locationData = LocationUpdateDTOSchema.parse(data);
     const location = await models.Location.findByPk(id);
     if (!location) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     await models.Location.update(locationData, { where: { id } });
     return true;
@@ -44,7 +45,7 @@ class LocationService {
   delete = async (id) => {
     const location = await models.Location.findByPk(id);
     if (!location) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     await models.Location.destroy({ where: { id } });
     return true;

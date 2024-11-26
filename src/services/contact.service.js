@@ -1,5 +1,6 @@
 const { models } = require("../sequelize");
 const { ErrDataNotFound } = require("../errors/base.error");
+const { AppError } = require("../app-error");
 const { ContactCondDTOSchema, ContactCreateDTOSchema } = require("../validation/contact.validation");
 
 class ContactService {
@@ -16,7 +17,7 @@ class ContactService {
   getDetail = async (id) => {
     const contact = await models.Contact.findByPk(id);
     if (!contact) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     return contact.get({ plain: true });
   };

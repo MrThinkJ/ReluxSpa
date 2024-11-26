@@ -21,6 +21,8 @@ const ErrEmployeeNotFound = new Error("Employee not found");
 const ErrLocationNotFound = new Error("Location not found");
 const ErrCustomerNotFound = new Error("Customer not found");
 const ErrServiceNotFound = new Error("Service not found");
+const ErrCustomerBookingOverlap = new Error("You already have a booking during this time slot");
+const ErrEmployeeBookingOverlap = new Error("The selected employee is not available during this time slot");
 
 module.exports = {
   ErrNameRequired,
@@ -42,4 +44,6 @@ module.exports = {
   ErrLocationNotFound,
   ErrCustomerNotFound,
   ErrServiceNotFound,
+  ErrCustomerBookingOverlap,
+  ErrEmployeeBookingOverlap,
 };

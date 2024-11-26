@@ -2,6 +2,7 @@ const { v7 } = require("uuid");
 const { sendMail } = require("./mail.service");
 const { models } = require("../sequelize");
 const bcrypt = require("bcrypt");
+const { AppError } = require("../app-error");
 const {
   ErrUserNotFound,
   ErrInvalidOTP,
@@ -36,7 +37,7 @@ class ResetPasswordService {
   async sendOTP(email) {
     const user = await models.User.findOne({ where: { email } });
     if (!user) {
-      throw ErrUserNotFound;
+      throw AppError.from(ErrUserNotFound, 404);
     }
     await models.Otp.destroy({ where: { email, isUsed: false } });
     const otpCode = this.generateOTP();
@@ -54,14 +55,14 @@ class ResetPasswordService {
   async verifyOTP(email, otpCode) {
     const user = await models.User.findOne({ where: { email } });
     if (!user) {
-      throw ErrUserNotFound;
+      throw AppError.from(ErrUserNotFound, 404);
     }
     const otp = await models.Otp.findOne({ where: { email, code: otpCode, isUsed: false } });
     if (!otp) {
-      throw ErrInvalidOTP;
+      throw AppError.from(ErrInvalidOTP, 400);
     }
     if (otp.expiresAt < new Date()) {
-      throw ErrOTPUsed;
+      throw AppError.from(ErrOTPUsed, 400);
     }
     const token = this.generateToken();
     const passwordReset = {
@@ -77,16 +78,16 @@ class ResetPasswordService {
   async resetPassword(token, newPassword, email) {
     const user = await models.User.findOne({ where: { email } });
     if (!user) {
-      throw ErrOTPNotFound;
+      throw AppError.from(ErrOTPNotFound, 404);
     }
     const passwordReset = await models.PasswordResetToken.findOne({
       where: { token, userId: user.id },
     });
     if (!passwordReset) {
-      throw ErrPasswordResetNotFound;
+      throw AppError.from(ErrPasswordResetNotFound, 404);
     }
     if (passwordReset.expiresAt < new Date()) {
-      throw ErrPasswordResetExpired;
+      throw AppError.from(ErrPasswordResetExpired, 400);
     }
     const passwordHash = await bcrypt.hash(newPassword, 10);
     await models.User.update({ passwordHash }, { where: { id: user.id } });

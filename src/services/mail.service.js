@@ -6,7 +6,7 @@ module.exports = {
     try {
       await transporter.sendMail(mailOptions);
     } catch (error) {
-      throw AppError.from(error);
+      throw AppError.from(error, 500);
     }
   },
 };

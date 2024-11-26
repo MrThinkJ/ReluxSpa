@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+const { AppError } = require("../app-error");
 const { ErrDataAlreadyExist, ErrDataNotFound, ErrInvalidToken } = require("../errors/base.error");
 const { ErrInvalidEmailAndPassword } = require("../errors/user.error");
 const { models } = require("../sequelize");
@@ -16,7 +17,7 @@ class UserService {
   profile = async (username) => {
     const user = await models.User.findOne({ where: { username } });
     if (!user) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     return user;
   };
@@ -24,30 +25,31 @@ class UserService {
   verifyToken = async (token) => {
     const payload = await verifyToken(token);
     if (!payload) {
-      throw ErrInvalidToken;
+      throw AppError.from(ErrInvalidToken, 400);
     }
     const user = await models.User.findOne({ where: { username: payload.sub } });
     if (!user) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
-    return payload;
+    const { passwordHash, ...userData } = user.get({ plain: true });
+    return userData;
   };
 
   login = async (data) => {
     const loginData = UserLoginDTOSchema.parse(data);
     const user = await models.User.findOne({ where: { username: loginData.username } });
     if (!user) {
-      throw ErrInvalidEmailAndPassword;
+      throw AppError.from(ErrInvalidEmailAndPassword, 400);
     }
 
     const isPasswordMatch = await bcrypt.compare(loginData.password, user.passwordHash);
     if (!isPasswordMatch) {
-      throw ErrInvalidEmailAndPassword;
+      throw AppError.from(ErrInvalidEmailAndPassword, 400);
     }
 
     const role = await models.Role.findOne({ where: { id: user.roleId } });
     if (!role) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
 
     const payload = {
@@ -63,21 +65,21 @@ class UserService {
     const registerData = UserRegistrationDTOSchema.parse(data);
     const isUsernameExist = await models.User.findOne({ where: { username: registerData.username } });
     if (isUsernameExist) {
-      throw ErrDataAlreadyExist;
+      throw AppError.from(ErrDataAlreadyExist, 400);
     }
     const isEmailExist = await models.User.findOne({ where: { email: registerData.email } });
     if (isEmailExist) {
-      throw ErrDataAlreadyExist;
+      throw AppError.from(ErrDataAlreadyExist, 400);
     }
     const isPhoneExist = await models.User.findOne({ where: { phone: registerData.phone } });
     if (isPhoneExist) {
-      throw ErrDataAlreadyExist;
+      throw AppError.from(ErrDataAlreadyExist, 400);
     }
 
     const passwordHash = await bcrypt.hash(registerData.password, 10);
     const role = await models.Role.findOne({ where: { name: "USER" } });
     if (!role) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
 
     const user = {
@@ -101,7 +103,7 @@ class UserService {
   getDetail = async (id) => {
     const user = await models.User.findByPk(id);
     if (!user) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     return user.get({ plain: true });
   };
@@ -110,23 +112,23 @@ class UserService {
     const createData = UserCreateDTOSchema.parse(data);
     const isUsernameExist = await models.User.findOne({ where: { username: createData.username } });
     if (isUsernameExist) {
-      throw ErrDataAlreadyExist;
+      throw AppError.from(ErrDataAlreadyExist, 400);
     }
 
     const isEmailExist = await models.User.findOne({ where: { email: createData.email } });
     if (isEmailExist) {
-      throw ErrDataAlreadyExist;
+      throw AppError.from(ErrDataAlreadyExist, 400);
     }
 
     const isPhoneExist = await models.User.findOne({ where: { phone: createData.phone } });
     if (isPhoneExist) {
-      throw ErrDataAlreadyExist;
+      throw AppError.from(ErrDataAlreadyExist, 400);
     }
 
     const passwordHash = await bcrypt.hash(createData.password, 10);
     const role = await models.Role.findByPk(createData.roleId);
     if (!role) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
 
     const user = {
@@ -139,20 +141,20 @@ class UserService {
     return user;
   };
 
-  update = async (id, data) => {
+  update = async (username, data) => {
     const updateData = UserUpdateDTOSchema.parse(data);
-    const user = await models.User.findByPk(id);
+    const user = await models.User.findOne({ where: { username } });
     if (!user) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
-    await models.User.update(updateData, { where: { id } });
+    await models.User.update(updateData, { where: { username } });
     return true;
   };
 
   delete = async (id) => {
     const user = await models.User.findByPk(id);
     if (!user) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     await models.User.destroy({ where: { id } });
     return true;

@@ -74,8 +74,8 @@ class UserController {
   };
 
   update = async (req, res) => {
-    const { id } = req.params;
-    const result = await UserService.update(Number(id), req.body);
+    const { username } = res.locals.requester;
+    const result = await UserService.update(username, req.body);
     res.status(200).json({ data: result });
   };
 

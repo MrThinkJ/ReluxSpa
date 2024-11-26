@@ -1,5 +1,6 @@
 const { models } = require("../sequelize");
 const { ErrDataNotFound } = require("../errors/base.error");
+const { AppError } = require("../app-error");
 const { weekday } = require("../utils/helper");
 const {
   EmployeeCondDTOSchema,
@@ -39,7 +40,7 @@ class EmployeeService {
       ],
     });
     if (!employee) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     return employee.get({ plain: true });
   };
@@ -49,7 +50,7 @@ class EmployeeService {
     if (value.locationId) {
       const location = await models.Location.findByPk(value.locationId);
       if (!location) {
-        throw ErrDataNotFound;
+        throw AppError.from(ErrDataNotFound, 404);
       }
     }
     const employee = await models.Employee.create(value);
@@ -60,12 +61,12 @@ class EmployeeService {
     const value = EmployeeUpdateDTOSchema.parse(data);
     const employee = await models.Employee.findByPk(id);
     if (!employee) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     if (value.locationId) {
       const location = await models.Location.findByPk(value.locationId);
       if (!location) {
-        throw ErrDataNotFound;
+        throw AppError.from(ErrDataNotFound, 404);
       }
     }
     await models.Employee.update(value, { where: { id } });
@@ -75,7 +76,7 @@ class EmployeeService {
   delete = async (id) => {
     const employee = await models.Employee.findByPk(id);
     if (!employee) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     await models.Employee.destroy({ where: { id } });
     return true;
@@ -84,7 +85,7 @@ class EmployeeService {
   getWorkSchedules = async (employeeId) => {
     const employee = await models.Employee.findByPk(employeeId);
     if (!employee) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     const workSchedules = await employee.getWorkSchedules();
     return workSchedules.map((workSchedule) => workSchedule.get({ plain: true }));
@@ -93,11 +94,11 @@ class EmployeeService {
   addWorkSchedule = async (employeeId, workScheduleId) => {
     const employee = await models.Employee.findByPk(employeeId);
     if (!employee) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     const workSchedule = await models.WorkSchedule.findByPk(workScheduleId);
     if (!workSchedule) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     await employee.addWorkSchedule(workSchedule);
     return true;
@@ -106,11 +107,11 @@ class EmployeeService {
   removeWorkSchedule = async (employeeId, workScheduleId) => {
     const employee = await models.Employee.findByPk(employeeId);
     if (!employee) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     const workSchedule = await models.WorkSchedule.findByPk(workScheduleId);
     if (!workSchedule) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     await employee.removeWorkSchedule(workSchedule);
     return true;
@@ -119,7 +120,7 @@ class EmployeeService {
   getBookings = async (employeeId) => {
     const employee = await models.Employee.findByPk(employeeId);
     if (!employee) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     const bookings = await models.Booking.findAll({
       where: { employeeId },

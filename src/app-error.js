@@ -88,7 +88,7 @@ const responseErr = (err, res) => {
   if (err.error && typeof err.error === "string") {
     try {
       const parsedError = JSON.parse(err.error);
-      const appErr = ErrInvalidRequest.wrap(new Error("Validation failed"));
+      const appErr = AppError.from(new Error("Validation failed"), 400);
 
       if (Array.isArray(parsedError)) {
         parsedError.forEach((issue) => {

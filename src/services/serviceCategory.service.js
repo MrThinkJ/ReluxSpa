@@ -1,4 +1,5 @@
 const { models } = require("../sequelize");
+const { AppError } = require("../app-error");
 const { ErrDataNotFound } = require("../errors/base.error");
 const {
   ServiceCategoryCondDTOSchema,
@@ -20,7 +21,7 @@ class ServiceCategoryService {
   getDetail = async (id) => {
     const serviceCategory = await models.ServiceCategory.findByPk(id);
     if (!serviceCategory) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     return serviceCategory.get({ plain: true });
   };
@@ -33,7 +34,7 @@ class ServiceCategoryService {
     const value = ServiceCategoryUpdateDTOSchema.parse(data);
     const serviceCategory = await models.ServiceCategory.findByPk(id);
     if (!serviceCategory) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     await models.ServiceCategory.update(value, { where: { id } });
     return true;
@@ -41,7 +42,7 @@ class ServiceCategoryService {
   delete = async (id) => {
     const serviceCategory = await models.ServiceCategory.findByPk(id);
     if (!serviceCategory) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
     await models.ServiceCategory.destroy({ where: { id } });
     return true;
