@@ -12,6 +12,8 @@ const {
   UserCreateDTOSchema,
 } = require("../validation/user.validation");
 const { PagingDTOSchema } = require("../validation/paging.validation");
+const fileUpload = require("../utils/fileUpload");
+const fs = require("fs").promises;
 
 class UserService {
   profile = async (username) => {
@@ -86,6 +88,7 @@ class UserService {
       ...registerData,
       roleId: role.id,
       passwordHash,
+      bookingCount: 0,
     };
 
     await models.User.create(user);
@@ -157,6 +160,25 @@ class UserService {
       throw AppError.from(ErrDataNotFound, 404);
     }
     await models.User.destroy({ where: { id } });
+    return true;
+  };
+
+  updateAvatar = async (username, file) => {
+    const user = await models.User.findOne({ where: { username } });
+    if (!user) {
+      throw AppError.from(ErrDataNotFound, 404);
+    }
+    if (user.avatar) {
+      try {
+        await fs.unlink(fileUpload.getImagePath(user.avatar));
+      } catch (error) {
+        console.error("Error deleting old avatar:", error);
+      }
+    }
+
+    const filename = await fileUpload.saveImage(file);
+    await models.User.update({ avatar: filename }, { where: { username } });
+
     return true;
   };
 }

@@ -8,6 +8,8 @@ const UserSchema = z.object({
   email: z.string().email({ message: "Email is invalid" }),
   phone: z.string().min(10, { message: "Phone must be at least 10 characters" }),
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters" }),
+  avatar: z.string().optional(),
+  bookingCount: z.number().optional(),
 });
 const UserCondDTOSchema = z.object({
   username: z.string().optional(),

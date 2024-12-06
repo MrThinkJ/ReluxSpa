@@ -84,6 +84,16 @@ class UserController {
     const result = await UserService.delete(Number(id));
     res.status(200).json({ data: result });
   };
+
+  updateAvatar = async (req, res) => {
+    try {
+      const username = res.locals.requester.username;
+      const result = await UserService.updateAvatar(username, req.file);
+      res.status(200).json({ data: result });
+    } catch (error) {
+      res.status(error.statusCode || 500).json({ error: error.message });
+    }
+  };
 }
 
 module.exports = new UserController();

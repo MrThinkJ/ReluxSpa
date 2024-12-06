@@ -32,6 +32,7 @@ class BookingController {
       customerUsername: res.locals.requester.username,
     };
     const result = await BookingService.makeBooking(bookingData);
+
     res.status(200).json({ data: result });
   };
 

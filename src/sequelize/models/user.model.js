@@ -38,6 +38,14 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING(255),
         field: "FullName",
       },
+      avatar: {
+        type: DataTypes.STRING(255),
+        field: "Avatar",
+      },
+      bookingCount: {
+        type: DataTypes.INTEGER,
+        field: "BookingCount",
+      },
     },
     {
       sequelize,
