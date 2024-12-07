@@ -136,7 +136,8 @@ class BookingService {
       endTime: bookingEndTime,
     });
     await result.addServices(services);
-    await models.User.update({ bookingCount: { [Op.add]: 1 } }, { where: { id: customer.id } });
+    const count = await models.Booking.count({ where: { customerId: customer.id } });
+    await models.User.update({ bookingCount: count }, { where: { id: customer.id } });
     return result.get({ plain: true }).id;
   };
 
