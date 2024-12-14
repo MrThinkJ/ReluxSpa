@@ -88,7 +88,9 @@ class EmployeeService {
       throw AppError.from(ErrDataNotFound, 404);
     }
     const workSchedules = await employee.getWorkSchedules();
-    return workSchedules.map((workSchedule) => workSchedule.get({ plain: true }));
+    return workSchedules.map((workSchedule) =>
+      workSchedule.get({ plain: true })
+    );
   };
 
   addWorkSchedule = async (employeeId, workScheduleId) => {
@@ -188,7 +190,7 @@ class EmployeeService {
     const date = new Date(condValue.date);
     const employee = await models.Employee.findByPk(employeeId);
     if (!employee) {
-      throw ErrDataNotFound;
+      throw AppError.from(ErrDataNotFound, 404);
     }
 
     const workSchedules = await employee.getWorkSchedules({
@@ -218,6 +220,7 @@ class EmployeeService {
 
     const freeTimeSlots = [];
     const currentDate = new Date();
+    currentDate.setUTCHours(currentDate.getUTCHours() + 7);
     const scheduleMap = {};
     workSchedules.forEach((schedule) => {
       const dayOfWeek = schedule.dayOfWeek;
@@ -232,10 +235,19 @@ class EmployeeService {
         const [scheduleStartHours, scheduleStartMinutes] = startTime.split(":");
         const [scheduleEndHours, scheduleEndMinutes] = endTime.split(":");
         const scheduleStart = new Date(currentDate);
-        scheduleStart.setHours(parseInt(scheduleStartHours), parseInt(scheduleStartMinutes), 0, 0);
+        scheduleStart.setUTCHours(
+          parseInt(scheduleStartHours),
+          parseInt(scheduleStartMinutes),
+          0,
+          0
+        );
         const scheduleEnd = new Date(currentDate);
-        scheduleEnd.setHours(parseInt(scheduleEndHours), parseInt(scheduleEndMinutes), 0, 0);
-
+        scheduleEnd.setUTCHours(
+          parseInt(scheduleEndHours),
+          parseInt(scheduleEndMinutes),
+          0,
+          0
+        );
         const dayBookings = bookings.filter((booking) => {
           const bookingDate = new Date(booking.bookingTime);
           return (
@@ -244,29 +256,28 @@ class EmployeeService {
             bookingDate.getFullYear() === currentDate.getFullYear()
           );
         });
-
         if (dayBookings.length == 0) {
           freeTimeSlots.push({
             date: currentDate.toISOString().split("T")[0],
-            startTime: scheduleStart.toTimeString().slice(0, 5),
-            endTime: scheduleEnd.toTimeString().slice(0, 5),
+            startTime: scheduleStart.toUTCString().slice(17, 22),
+            endTime: scheduleEnd.toUTCString().slice(17, 22),
           });
+          currentDate.setDate(currentDate.getDate() + 1);
           continue;
         }
 
-        dayBookings.sort((a, b) => new Date(a.bookingTime) - new Date(b.bookingTime));
-
+        dayBookings.sort(
+          (a, b) => new Date(a.bookingTime) - new Date(b.bookingTime)
+        );
         let currentTime = scheduleStart;
-
         for (const booking of dayBookings) {
           const bookingStart = new Date(booking.bookingTime);
           const bookingEnd = new Date(booking.endTime);
-
           if (currentTime < bookingStart) {
             freeTimeSlots.push({
               date: currentDate.toISOString().split("T")[0],
-              startTime: currentTime.toTimeString().slice(0, 5),
-              endTime: bookingStart.toTimeString().slice(0, 5),
+              startTime: currentTime.toUTCString().slice(17, 22),
+              endTime: bookingStart.toUTCString().slice(17, 22),
             });
           }
           currentTime = bookingEnd;
@@ -275,8 +286,8 @@ class EmployeeService {
         if (currentTime < scheduleEnd) {
           freeTimeSlots.push({
             date: currentDate.toISOString().split("T")[0],
-            startTime: currentTime.toTimeString().slice(0, 5),
-            endTime: scheduleEnd.toTimeString().slice(0, 5),
+            startTime: currentTime.toUTCString().slice(17, 22),
+            endTime: scheduleEnd.toUTCString().slice(17, 22),
           });
         }
       }
