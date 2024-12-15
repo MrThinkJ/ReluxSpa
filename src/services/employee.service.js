@@ -185,9 +185,11 @@ class EmployeeService {
     return availableEmployees;
   };
 
-  getEmployeeFreeTime = async (employeeId, cond) => {
-    const condValue = EmployeeFreeTimeCondDTOSchema.parse(cond);
-    const date = new Date(condValue.date);
+  getEmployeeFreeTime = async (employeeId) => {
+    const currentDate = new Date();
+    currentDate.setUTCHours(currentDate.getUTCHours() + 7);
+    const nextWeekDate = new Date(currentDate);
+    nextWeekDate.setUTCDate(currentDate.getUTCDate() + 7);
     const employee = await models.Employee.findByPk(employeeId);
     if (!employee) {
       throw AppError.from(ErrDataNotFound, 404);
@@ -205,12 +207,12 @@ class EmployeeService {
         [Op.and]: [
           {
             bookingTime: {
-              [Op.gte]: new Date(),
+              [Op.gte]: currentDate,
             },
           },
           {
             bookingTime: {
-              [Op.lte]: date,
+              [Op.lte]: nextWeekDate,
             },
           },
         ],
@@ -219,14 +221,12 @@ class EmployeeService {
     });
 
     const freeTimeSlots = [];
-    const currentDate = new Date();
-    currentDate.setUTCHours(currentDate.getUTCHours() + 7);
     const scheduleMap = {};
     workSchedules.forEach((schedule) => {
       const dayOfWeek = schedule.dayOfWeek;
       scheduleMap[dayOfWeek] = schedule;
     });
-    while (currentDate.getDate() !== date.getDate()) {
+    while (currentDate.getDate() !== nextWeekDate.getDate()) {
       const dayOfWeek = weekday[currentDate.getDay()];
       if (scheduleMap[dayOfWeek]) {
         const schedule = scheduleMap[dayOfWeek];

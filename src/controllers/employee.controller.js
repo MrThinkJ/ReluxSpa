@@ -46,13 +46,19 @@ class EmployeeController {
 
   addWorkSchedule = async (req, res) => {
     const { id, scheduleId } = req.params;
-    const result = await EmployeeService.addWorkSchedule(Number(id), Number(scheduleId));
+    const result = await EmployeeService.addWorkSchedule(
+      Number(id),
+      Number(scheduleId)
+    );
     res.status(200).json({ data: result });
   };
 
   removeWorkSchedule = async (req, res) => {
     const { id, scheduleId } = req.params;
-    const result = await EmployeeService.removeWorkSchedule(Number(id), Number(scheduleId));
+    const result = await EmployeeService.removeWorkSchedule(
+      Number(id),
+      Number(scheduleId)
+    );
     res.status(200).json({ data: result });
   };
 
@@ -69,7 +75,7 @@ class EmployeeController {
 
   getEmployeeFreeTime = async (req, res) => {
     const { id } = req.params;
-    const result = await EmployeeService.getEmployeeFreeTime(Number(id), req.body);
+    const result = await EmployeeService.getEmployeeFreeTime(Number(id));
     res.status(200).json({ data: result });
   };
 }
