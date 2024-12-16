@@ -186,123 +186,156 @@ class EmployeeService {
   };
 
   getEmployeeFreeTime = async (employeeId) => {
-    const currentDate = new Date();
-    currentDate.setUTCHours(currentDate.getUTCHours() + 7);
-    const curDateUTC = new Date(currentDate);
-    curDateUTC.setUTCHours(0, 0, 0, 0);
-    const nextWeekDate = new Date(currentDate);
-    nextWeekDate.setUTCDate(currentDate.getUTCDate() + 7);
+    // 1. Initial validation
     const employee = await models.Employee.findByPk(employeeId);
     if (!employee) {
       throw AppError.from(ErrDataNotFound, 404);
     }
 
-    const workSchedules = await employee.getWorkSchedules({
-      where: {
-        isAvailable: true,
-      },
-    });
+    const currentDate = this.getDateWithThaiOffset();
 
-    const bookings = await models.Booking.findAll({
+    const curDateUTC = new Date(currentDate.setUTCHours(0, 0, 0, 0));
+    const currentDateCopy = new Date(currentDate);
+    const nextWeekDate = new Date(
+      currentDateCopy.setDate(currentDateCopy.getDate() + 7)
+    );
+
+    const [workSchedules, bookings] = await Promise.all([
+      this.getEmployeeWorkSchedules(employee),
+      this.getEmployeeBookings(employeeId, curDateUTC, nextWeekDate),
+    ]);
+    const scheduleMap = this.createScheduleMap(workSchedules);
+
+    const freeTimeSlots = this.generateFreeTimeSlots(
+      currentDate,
+      nextWeekDate,
+      scheduleMap,
+      bookings
+    );
+    // 6. Filter out past slots
+    return this.filterPastSlots(freeTimeSlots);
+  };
+
+  // Helper methods
+  getDateWithThaiOffset() {
+    const date = new Date();
+    date.setUTCHours(date.getUTCHours() + 7);
+    return date;
+  }
+
+  async getEmployeeWorkSchedules(employee) {
+    return employee.getWorkSchedules({
+      where: { isAvailable: true },
+    });
+  }
+
+  async getEmployeeBookings(employeeId, startDate, endDate) {
+    return models.Booking.findAll({
       where: {
         employeeId,
         [Op.and]: [
-          {
-            bookingTime: {
-              [Op.gte]: curDateUTC,
-            },
-          },
-          {
-            bookingTime: {
-              [Op.lte]: nextWeekDate,
-            },
-          },
+          { bookingTime: { [Op.gte]: startDate } },
+          { bookingTime: { [Op.lte]: endDate } },
         ],
       },
       order: [["bookingTime", "ASC"]],
     });
+  }
 
-    const freeTimeSlots = [];
+  createScheduleMap(workSchedules) {
     const scheduleMap = {};
     workSchedules.forEach((schedule) => {
-      const dayOfWeek = schedule.dayOfWeek;
-      scheduleMap[dayOfWeek] = schedule;
+      scheduleMap[schedule.dayOfWeek] = schedule;
     });
-    while (currentDate.getDate() !== nextWeekDate.getDate()) {
-      const dayOfWeek = weekday[currentDate.getDay()];
-      if (scheduleMap[dayOfWeek]) {
-        const schedule = scheduleMap[dayOfWeek];
-        const startTime = schedule.startTime;
-        const endTime = schedule.endTime;
-        const [scheduleStartHours, scheduleStartMinutes] = startTime.split(":");
-        const [scheduleEndHours, scheduleEndMinutes] = endTime.split(":");
-        const scheduleStart = new Date(currentDate);
-        scheduleStart.setUTCHours(
-          parseInt(scheduleStartHours),
-          parseInt(scheduleStartMinutes),
-          0,
-          0
-        );
-        const scheduleEnd = new Date(currentDate);
-        scheduleEnd.setUTCHours(
-          parseInt(scheduleEndHours),
-          parseInt(scheduleEndMinutes),
-          0,
-          0
-        );
-        const dayBookings = bookings.filter((booking) => {
-          const bookingDate = new Date(booking.bookingTime);
-          return (
-            bookingDate.getDate() === currentDate.getDate() &&
-            bookingDate.getMonth() === currentDate.getMonth() &&
-            bookingDate.getFullYear() === currentDate.getFullYear()
-          );
-        });
-        if (dayBookings.length == 0) {
-          freeTimeSlots.push({
-            date: currentDate.toISOString().split("T")[0],
-            startTime: scheduleStart.toUTCString().slice(17, 22),
-            endTime: scheduleEnd.toUTCString().slice(17, 22),
-          });
-          currentDate.setDate(currentDate.getDate() + 1);
-          continue;
-        }
+    return scheduleMap;
+  }
 
-        dayBookings.sort(
-          (a, b) => new Date(a.bookingTime) - new Date(b.bookingTime)
-        );
-        let currentTime = scheduleStart;
-        for (const booking of dayBookings) {
-          const bookingStart = new Date(booking.bookingTime);
-          const bookingEnd = new Date(booking.endTime);
-          if (currentTime < bookingStart) {
-            freeTimeSlots.push({
-              date: currentDate.toISOString().split("T")[0],
-              startTime: currentTime.toUTCString().slice(17, 22),
-              endTime: bookingStart.toUTCString().slice(17, 22),
-            });
-          }
-          currentTime = bookingEnd;
-        }
+  generateFreeTimeSlots(currentDate, nextWeekDate, scheduleMap, bookings) {
+    const freeTimeSlots = [];
+    const processDate = new Date(currentDate);
 
-        if (currentTime < scheduleEnd) {
-          freeTimeSlots.push({
-            date: currentDate.toISOString().split("T")[0],
-            startTime: currentTime.toUTCString().slice(17, 22),
-            endTime: scheduleEnd.toUTCString().slice(17, 22),
-          });
-        }
+    while (processDate.getDate() !== nextWeekDate.getDate()) {
+      const dayOfWeek = weekday[processDate.getDay()];
+      const schedule = scheduleMap[dayOfWeek];
+      if (schedule) {
+        const slots = this.generateDaySlots(processDate, schedule, bookings);
+        freeTimeSlots.push(...slots);
       }
-      currentDate.setDate(currentDate.getDate() + 1);
+
+      processDate.setDate(processDate.getDate() + 1);
     }
-    const now = new Date();
-    now.setUTCHours(now.getUTCHours() + 7);
-    freeTimeSlots = freeTimeSlots.filter((slot) => {
+
+    return freeTimeSlots;
+  }
+
+  generateDaySlots(date, schedule, bookings) {
+    const slots = [];
+    const { startTime, endTime } = this.getScheduleTimes(schedule, date);
+
+    const dayBookings = this.filterBookingsForDate(bookings, date);
+
+    if (dayBookings.length === 0) {
+      slots.push(this.createTimeSlot(date, startTime, endTime));
+      return slots;
+    }
+
+    let currentTime = startTime;
+    dayBookings.forEach((booking) => {
+      const bookingStart = new Date(booking.bookingTime);
+      const bookingEnd = new Date(booking.endTime);
+
+      if (currentTime < bookingStart) {
+        slots.push(this.createTimeSlot(date, currentTime, bookingStart));
+      }
+      currentTime = bookingEnd;
+    });
+
+    if (currentTime < endTime) {
+      slots.push(this.createTimeSlot(date, currentTime, endTime));
+    }
+    return slots;
+  }
+
+  getScheduleTimes(schedule, date) {
+    const parseTime = (timeStr) => {
+      const [hours, minutes] = timeStr.split(":").map(Number);
+      const time = new Date(date);
+      time.setUTCHours(hours, minutes, 0, 0);
+      return time;
+    };
+
+    return {
+      startTime: parseTime(schedule.startTime),
+      endTime: parseTime(schedule.endTime),
+    };
+  }
+
+  filterBookingsForDate(bookings, date) {
+    return bookings.filter((booking) => {
+      const bookingDate = new Date(booking.bookingTime);
+      return (
+        bookingDate.getDate() === date.getDate() &&
+        bookingDate.getMonth() === date.getMonth() &&
+        bookingDate.getFullYear() === date.getFullYear()
+      );
+    });
+  }
+
+  createTimeSlot(date, startTime, endTime) {
+    return {
+      date: date.toISOString().split("T")[0],
+      startTime: startTime.toUTCString().slice(17, 22),
+      endTime: endTime.toUTCString().slice(17, 22),
+    };
+  }
+
+  filterPastSlots(slots) {
+    const now = this.getDateWithThaiOffset();
+    return slots.filter((slot) => {
       const slotDate = new Date(`${slot.date}T${slot.startTime}`);
       return slotDate > now;
     });
-    return freeTimeSlots;
-  };
+  }
 }
 
 module.exports = new EmployeeService();
