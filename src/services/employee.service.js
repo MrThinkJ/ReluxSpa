@@ -188,6 +188,8 @@ class EmployeeService {
   getEmployeeFreeTime = async (employeeId) => {
     const currentDate = new Date();
     currentDate.setUTCHours(currentDate.getUTCHours() + 7);
+    const curDateUTC = new Date(currentDate);
+    curDateUTC.setUTCHours(0, 0, 0, 0);
     const nextWeekDate = new Date(currentDate);
     nextWeekDate.setUTCDate(currentDate.getUTCDate() + 7);
     const employee = await models.Employee.findByPk(employeeId);
@@ -207,7 +209,7 @@ class EmployeeService {
         [Op.and]: [
           {
             bookingTime: {
-              [Op.gte]: currentDate,
+              [Op.gte]: curDateUTC,
             },
           },
           {
@@ -293,6 +295,12 @@ class EmployeeService {
       }
       currentDate.setDate(currentDate.getDate() + 1);
     }
+    const now = new Date();
+    now.setUTCHours(now.getUTCHours() + 7);
+    freeTimeSlots = freeTimeSlots.filter((slot) => {
+      const slotDate = new Date(`${slot.date}T${slot.startTime}`);
+      return slotDate > now;
+    });
     return freeTimeSlots;
   };
 }
