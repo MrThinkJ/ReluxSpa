@@ -55,7 +55,7 @@ module.exports = (sequelize) => {
     },
     {
       sequelize,
-      tableName: "Employees",
+      tableName: "employees",
       modelName,
       timestamps: false,
     }

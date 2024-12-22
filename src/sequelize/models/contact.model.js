@@ -28,9 +28,8 @@ module.exports = (sequelize) =>
     },
     {
       sequelize,
-      tableName: "Contact",
+      tableName: "contact",
       modelName,
       timestamps: false,
     }
   );
- 
