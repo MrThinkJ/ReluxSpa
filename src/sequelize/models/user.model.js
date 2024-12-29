@@ -46,6 +46,11 @@ module.exports = (sequelize) => {
         type: DataTypes.INTEGER,
         field: "BookingCount",
       },
+      isActive: {
+        type: DataTypes.BOOLEAN,
+        field: "IsActive",
+        defaultValue: false,
+      },
     },
     {
       sequelize,

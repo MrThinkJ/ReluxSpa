@@ -57,20 +57,38 @@ class ResetPasswordService {
     if (!user) {
       throw AppError.from(ErrUserNotFound, 404);
     }
-    const otp = await models.Otp.findOne({ where: { email, code: otpCode, isUsed: false } });
+    const otp = await models.Otp.findOne({
+      where: { email, code: otpCode, isUsed: false },
+    });
     if (!otp) {
       throw AppError.from(ErrInvalidOTP, 400);
     }
-    if (otp.expiresAt < new Date()) {
+    if (otp.expiryDate < new Date()) {
       throw AppError.from(ErrOTPUsed, 400);
     }
     const token = this.generateToken();
-    const passwordReset = {
-      token: token,
-      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
-      userId: user.id,
-    };
-    await models.PasswordResetToken.create(passwordReset);
+    let accountToken = await models.AccountToken.findOne({
+      where: { userId: user.id },
+    });
+    if (accountToken) {
+      await models.AccountToken.update(
+        {
+          token: token,
+          expiryDate: new Date(Date.now() + 1000 * 60 * 60 * 24),
+          isUsed: false,
+        },
+        {
+          where: { id: accountToken.id },
+        }
+      );
+    } else {
+      await models.AccountToken.create({
+        token: token,
+        expiryDate: new Date(Date.now() + 1000 * 60 * 60 * 24),
+        isUsed: false,
+        userId: user.id,
+      });
+    }
     await models.Otp.update({ isUsed: true }, { where: { id: otp.id } });
     return { isSuccess: true, resetPasswordToken: token };
   }
@@ -80,17 +98,21 @@ class ResetPasswordService {
     if (!user) {
       throw AppError.from(ErrOTPNotFound, 404);
     }
-    const passwordReset = await models.PasswordResetToken.findOne({
+    const accountToken = await models.AccountToken.findOne({
       where: { token, userId: user.id },
     });
-    if (!passwordReset) {
+    if (!accountToken) {
       throw AppError.from(ErrPasswordResetNotFound, 404);
     }
-    if (passwordReset.expiresAt < new Date()) {
+    if (accountToken.expiryDate < new Date()) {
       throw AppError.from(ErrPasswordResetExpired, 400);
     }
     const passwordHash = await bcrypt.hash(newPassword, 10);
     await models.User.update({ passwordHash }, { where: { id: user.id } });
+    await models.AccountToken.update(
+      { isUsed: true },
+      { where: { id: accountToken.id } }
+    );
     return { isSuccess: true };
   }
 }

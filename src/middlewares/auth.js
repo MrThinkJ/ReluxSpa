@@ -12,11 +12,18 @@ module.exports.authMiddleware = async (req, res, next) => {
     const requester = await verifyToken(token);
 
     // 3. Get user from database
-    const user = await models.User.findOne({ where: { username: requester.sub } });
+    const user = await models.User.findOne({
+      where: { username: requester.sub },
+    });
 
     // 4. Check user is exist
     if (!user) {
       res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+    // 5. Check user is active
+    if (!user.isActive) {
+      res.status(401).json({ error: "User is not active" });
       return;
     }
     const { roleId, username: username } = user;
@@ -25,7 +32,7 @@ module.exports.authMiddleware = async (req, res, next) => {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
-    // 5. Set requester to res.locals
+    // 6. Set requester to res.locals
     res.locals["requester"] = { username, role: role.name };
     return next();
   } catch (error) {

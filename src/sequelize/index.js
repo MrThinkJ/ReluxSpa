@@ -30,7 +30,7 @@ const modelDefiners = [
   require("./models/booking.model"),
   require("./models/bookingService.model"),
   require("./models/employeeWorkSchedule.model"),
-  require("./models/passwordResetToken.model"),
+  require("./models/accountToken.model"),
   require("./models/contact.model"),
 ];
 

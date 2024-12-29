@@ -9,8 +9,7 @@ function applySetup(sequelize) {
     Employee,
     Booking,
     EmployeeWorkSchedule,
-    Otp,
-    PasswordResetToken,
+    AccountToken,
     User,
     BookingService,
   } = sequelize.models;
@@ -114,13 +113,13 @@ function applySetup(sequelize) {
   });
 
   // User & PasswordResetToken relationship
-  User.hasMany(PasswordResetToken, {
+  User.hasMany(AccountToken, {
     foreignKey: "userId",
     targetKey: "id",
     field: "UserID",
-    as: "passwordResetTokens",
+    as: "accountTokens",
   });
-  PasswordResetToken.belongsTo(User, {
+  AccountToken.belongsTo(User, {
     foreignKey: "userId",
     targetKey: "id",
     field: "UserID",

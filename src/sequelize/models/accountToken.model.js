@@ -1,17 +1,17 @@
 const { DataTypes, Model } = require("sequelize");
 
-class PasswordResetTokenPersistence extends Model {}
+class AccountTokenPersistence extends Model {}
 
-const modelName = "PasswordResetToken";
+const modelName = "AccountToken";
 
 module.exports = (sequelize) =>
-  PasswordResetTokenPersistence.init(
+  AccountTokenPersistence.init(
     {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-        field: "ResetTokenID",
+        field: "AccountTokenID",
       },
       expiryDate: {
         type: DataTypes.DATE,
@@ -21,10 +21,15 @@ module.exports = (sequelize) =>
         type: DataTypes.STRING,
         field: "Token",
       },
+      isUsed: {
+        type: DataTypes.BOOLEAN,
+        field: "IsUsed",
+        defaultValue: false,
+      },
     },
     {
       sequelize,
-      tableName: "passwordresettokens",
+      tableName: "accounttokens",
       modelName,
       timestamps: false,
     }
